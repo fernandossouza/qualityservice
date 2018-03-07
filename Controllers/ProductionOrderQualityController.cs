@@ -16,7 +16,7 @@ namespace qualityservice.Controllers
             _productionOrderQualityService = productionOrderQualityService;
         }
 
-        [HttpGet("{status/status}")]
+        [HttpGet("status/{status}")]
         public async Task<IActionResult> Get(string status,[FromQuery]int startat,[FromQuery]int quantity)
         {
             try{
@@ -39,7 +39,7 @@ namespace qualityservice.Controllers
             }
         }
 
-        [HttpGet("{id/id}")]
+        [HttpGet("id/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             try{
@@ -58,7 +58,7 @@ namespace qualityservice.Controllers
             }
         }
 
-        [HttpGet("{number/number}")]
+        [HttpGet("number/{number}")]
         public async Task<IActionResult> Get(string number)
         {
             try{
@@ -78,13 +78,13 @@ namespace qualityservice.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(ProductionOrder productionOrder)
+        public async Task<IActionResult> Post([FromBody] ProductionOrder productionOrder)
         {
             try{
                 if (ModelState.IsValid)
                 {
                     var productionQuality = await _productionOrderQualityService
-                                                            .addProductionOrderQuality(productionOrder);
+                                                            .AddProductionOrderQuality(productionOrder);
 
                      return Created($"api/productionOrderQuality/{productionQuality.productionOrderQualityId}", productionQuality);
                 }   

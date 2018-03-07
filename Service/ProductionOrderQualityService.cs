@@ -18,21 +18,40 @@ namespace qualityservice.Service
         {
             _context = context;
         }
-        public async Task<ProductionOrderQuality> addProductionOrderQuality(ProductionOrder productionOrder)
+        public async Task<ProductionOrderQuality> AddProductionOrderQuality(ProductionOrder productionOrder)
         {
             ProductionOrderQuality productionOrderQuality = new ProductionOrderQuality();
 
+            
+
             productionOrderQuality.productionOrderNumber = productionOrder.productionOrderNumber;
-            productionOrderQuality.productionOrderQualityId = productionOrder.productionOrderId;
+            productionOrderQuality.productionOrderId = productionOrder.productionOrderId;
             productionOrderQuality.forno = "Forno1";
             productionOrderQuality.corrida = 1;
-            productionOrderQuality.posicao = "1";
+            productionOrderQuality.posicao = productionOrder.currentThing.thingName;
             productionOrderQuality.status = "waiting";
 
             _context.ProductionOrderQualities.Add(productionOrderQuality);
             await _context.SaveChangesAsync();
             return productionOrderQuality;
         }
+
+        // public async Task<ProductionOrderQuality> UpdateProductionOrderQuality(int productionOrderQualityId
+        // ,ProductionOrderQuality productionOrderQualityUpdate)
+        // {
+        //     var productionOrderQualityDb = await _context.ProductionOrderQualities
+        //                                         .AsNoTracking()
+        //                                         .Include(x=>x.Analysis)
+        //                                         .Where(x=>x.productionOrderQualityId == productionOrderQualityId)
+        //                                         .FirstOrDefaultAsync();
+            
+        //     if(productionOrderQualityDb == null || productionOrderQualityDb.productionOrderQualityId != productionOrderQualityId)
+        //         return null;
+
+        //     productionOrderQualityDb.Analysis = productionOrderQualityUpdate.Analysis;
+        //     productionOrderQualityDb.corrida = pro
+
+        // }
         public async Task<(List<ProductionOrderQuality>,int)> GetProductionOrderQualityPerStatus(string status,int startat, int quantity)
         {
             var productionOrderQualityList = await _context.ProductionOrderQualities.Where(x=>x.status == status)
