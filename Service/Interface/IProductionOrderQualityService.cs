@@ -7,7 +7,7 @@ namespace qualityservice.Service.Interface
     public interface IProductionOrderQualityService
     {
          Task<ProductionOrderQuality> AddProductionOrderQuality(ProductionOrder productionOrder);
-        // Task<ProductionOrderQuality> UpdateProductionOrderQuality(int productionOrderQualityId,ProductionOrder productionOrder);
+         Task<ProductionOrderQuality> updateProductionOrderQuality(int productionOrderQualityId,ProductionOrderQuality productioQualityUpdate);
          Task<(List<ProductionOrderQuality>,int)> GetProductionOrderQualityPerStatus(string status,int startat, int quantity);
          Task<ProductionOrderQuality> GetProductionOrderQualityId(int productionOrderQualityId);
          Task<ProductionOrderQuality> GetProductionOrderQualityNumber(string productionOrderNumber);         
