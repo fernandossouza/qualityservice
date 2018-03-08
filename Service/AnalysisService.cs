@@ -4,6 +4,9 @@ using qualityservice.Data;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using System.Net;
 
 namespace qualityservice.Service
 {
@@ -11,11 +14,16 @@ namespace qualityservice.Service
     {
         private readonly IProductionOrderQualityService _productionOrderQualityService;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private HttpClient client;
 
-        public AnalysisService(IProductionOrderQualityService productionOrderQualityService, ApplicationDbContext context)
+        public AnalysisService(IProductionOrderQualityService productionOrderQualityService,
+         ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
             _productionOrderQualityService = productionOrderQualityService;
+            _configuration = configuration;
+            client = new HttpClient();
         }
         
         public async Task<Analysis> AddAnalysis(int productionOrderQualityId,Analysis analysis)
@@ -34,11 +42,34 @@ namespace qualityservice.Service
             analysis.message = "Ajuste de elemento";
             // Fim
 
-            productionQuality.Analysis.Add(analysis);
+            var returnApi = await PutStatusAnalysisForProductionOrder(productionQuality.productionOrderId,analysis.status);
+            
+            if(returnApi)
+            {
+                productionQuality.status = analysis.status;
 
-            await _context.SaveChangesAsync();
+                productionQuality.Analysis.Add(analysis);
 
-            return analysis;
+                await _context.SaveChangesAsync();
+
+                return analysis;
+            }       
+            Console.WriteLine("Não foi possivel alterar o status da ordem de produção");
+            return null;    
+
+        }
+
+        private async Task<bool> PutStatusAnalysisForProductionOrder(int productionOrderId,string status)
+        {
+            var builder = new UriBuilder(_configuration["ProductionOrderStatusApi"] + "?productionOrderId="
+             + productionOrderId +"&state="+status);
+            string url = builder.ToString();
+            var result = await client.PutAsync(url,null);
+            
+            if(result.StatusCode == HttpStatusCode.OK || result.StatusCode == HttpStatusCode.NoContent)
+                return true;
+
+            return false;
         }
     }
 }
