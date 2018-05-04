@@ -19,5 +19,6 @@ namespace qualityservice.Model.ProductionOrderApi
         public int? currentThingId { get; set; }
         [Required]
         public Thing currentThing { get; set; }
+        public Recipe recipe { get; set; }
     }
 }

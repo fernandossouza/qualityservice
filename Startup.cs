@@ -39,6 +39,7 @@ namespace qualityservice
                 options.UseNpgsql(Configuration.GetConnectionString("ProductionOrderQualityDb")));
             services.AddTransient<IProductionOrderQualityService,ProductionOrderQualityService>();
             services.AddTransient<IAnalysisService,AnalysisService>();
+            services.AddTransient<ICalculateAnalysisService,CalculateAnalysisService>();
             services.AddMvc();
         }
 
