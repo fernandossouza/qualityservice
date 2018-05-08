@@ -43,23 +43,15 @@ namespace qualityservice.Service
             analysis.number = productionQuality.Analysis.Count + 1;
 
             // Espaço para os cálculos
-            var(returnSpecification,stringRetorno) = await RecipeSpecification(analysis,productionQuality.productionOrderId
+            var(returnSpecification,messages) = await RecipeSpecification(analysis,productionQuality.productionOrderId
             ,productionQuality.qntForno);
 
             if(returnSpecification)
                 analysis.status = "approved";
             else
                 analysis.status = "reproved";
-            foreach (var item in stringRetorno)
-            {
-                MessageCalculates message = new MessageCalculates();
-                message.message = item.ToString();
-                
-                if(analysis.messages == null)
-                    analysis.messages = new List<MessageCalculates>();
-
-                analysis.messages.Add(message);
-            }
+            
+            analysis.messages= messages;
             // Fim
 
             var returnApi = await PutStatusAnalysisForProductionOrder(productionQuality.productionOrderId,analysis.status);
@@ -79,16 +71,20 @@ namespace qualityservice.Service
 
         }
 
-        private async Task<(bool,List<string>)> RecipeSpecification(Analysis analysis, int productionOrderId, double qtdForno)
+        private async Task<(bool,List<MessageCalculates>)> RecipeSpecification(Analysis analysis, int productionOrderId, double qtdForno)
         {
             bool Approved = false;
-            List<string> stringRetorno = new List<string>(); 
+            List<MessageCalculates> messages = new List<MessageCalculates>(); 
             var productionOrder = await GetProductionOrder(productionOrderId);
 
             if(productionOrder == null)
-            {
-                stringRetorno.Add("ERRO - Não encontrado a ordem de produção na API");
-                return (false,stringRetorno);
+            {   
+
+                MessageCalculates message = new MessageCalculates();
+                message.key = "ERRO";
+                message.value = "Não encontrado a ordem de produção na API";
+                messages.Add(message);
+                return (false,messages);
             }
             foreach(var phase in productionOrder.recipe.phases)
             {
@@ -98,8 +94,11 @@ namespace qualityservice.Service
 
                     if(recipeComp == null)
                     {
-                        stringRetorno.Add("ERRO - Componente quimico não existe na receita, productId: " + comp.productId);
-                        return(false,stringRetorno);
+                        MessageCalculates message = new MessageCalculates();
+                        message.key = "ERRO";
+                        message.value = "Componente quimico não existe na receita, productId: " + comp.productId;
+                        messages.Add(message);
+                        return(false,messages);
                     }
                     comp.productName = recipeComp.product.productName;
                     if(recipeComp.minValue >= comp.value || recipeComp.maxValue <= comp.value)
@@ -113,12 +112,12 @@ namespace qualityservice.Service
             }
 
             if(Approved)
-                return (Approved,stringRetorno);
+                return (Approved,messages);
 
-            stringRetorno = await _calculateAnalysisService.Calculates(productionOrder.productionOrderId,qtdForno,analysis,true);           
+            messages.AddRange(await _calculateAnalysisService.Calculates(productionOrder.productionOrderId,qtdForno,analysis,true));           
             
 
-            return (Approved,stringRetorno);
+            return (Approved,messages);
 
         }
 

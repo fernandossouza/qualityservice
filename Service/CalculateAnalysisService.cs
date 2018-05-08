@@ -26,14 +26,18 @@ namespace qualityservice.Service
         }
         
 
-        public async Task<List<string>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis,bool ajuste)
+        public async Task<List<MessageCalculates>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis,bool ajuste)
         {
+            List<MessageCalculates> messages = new List<MessageCalculates>();
             List<string> stringReturn = new List<string>();
             var productionOrder = await GetProductionOrder(productionOrderId);
 
             if(productionOrder == null)
             {
-                stringReturn.Add("Ordem não encontrada");
+                MessageCalculates message = new MessageCalculates();
+                message.key="Ordem não encontrada";
+                message.value="Ordem não encontrada";
+                messages.Add(message);
             }
             else
             {
@@ -42,13 +46,17 @@ namespace qualityservice.Service
             if(productionOrderQuality == null)
                 productionOrderQuality = await _productionOrderQualityService.AddProductionOrderQuality(productionOrder);
            
-            stringReturn.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality,ajuste));
+            messages.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality,ajuste));
             }
-            return stringReturn;
+
+            
+            return messages;
         }
-        private async Task<List<string>> CalculatesAnalysis(Analysis analysisReal, ProductionOrder productionOrder, 
+        private async Task<List<MessageCalculates>> CalculatesAnalysis(Analysis analysisReal, ProductionOrder productionOrder, 
                                                             double furnaceQuantity, ProductionOrderQuality productionOrderQuality,bool ajuste)
         {
+
+            List<MessageCalculates> messages = new List<MessageCalculates>();
             List<string> stringReturn = new List<string>();
             double maxForno = Convert.ToDouble(_configuration["maxForno"]);
             double porcentagemForno = Convert.ToDouble(_configuration["porcentagemForno"]);
@@ -120,22 +128,27 @@ namespace qualityservice.Service
 
                 if(qtdForno > maxForno)
                 {
-                    stringReturn = new List<string>();
-                    stringReturn.Add("Excesso de Carga!");
-                    return stringReturn;
+                    MessageCalculates message = new MessageCalculates();
+                    message.key = "Excesso de Carga!";
+                    message.value = "Excesso de Carga!";
+                    messages.Add(message);
+                    return messages;
                 }
                 productionOrderQuality.qntForno = qtdForno;
                 if(analysisEstimada.valueKg > 0)
                 {
-                    string quantidadeAdicionar = string.Empty;
-                    quantidadeAdicionar = quantidadeAdicionar + " Adicionar " + analysisEstimada.valueKg;
-                    quantidadeAdicionar = quantidadeAdicionar + " Kg de " + analysisEstimada.productName + " ";
+                    MessageCalculates message = new MessageCalculates();
+                    message.key = analysisEstimada.productName;
+                    message.value = analysisEstimada.valueKg.ToString();
+                    
 
-                    stringReturn.Add(quantidadeAdicionar);
+                    messages.Add(message);
                 }
             }
             await _productionOrderQualityService.updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId,productionOrderQuality);
-            return stringReturn;
+
+
+            return messages;
         }
         
          private async Task<ProductionOrder> GetProductionOrder(int productionOrderId)

@@ -7,6 +7,6 @@ namespace qualityservice.Service.Interface
 {
     public interface ICalculateAnalysisService
     {
-         Task<List<string>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis,bool ajuste);
+         Task<List<MessageCalculates>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis,bool ajuste);
     }
 }

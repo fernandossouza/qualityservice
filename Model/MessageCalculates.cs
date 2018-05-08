@@ -5,6 +5,7 @@ namespace qualityservice.Model
     {
         [Key]
         public int messageId{get;set;}
-        public string message{get;set;}
+        public string key{get;set;}
+        public string value{get;set;}
     }
 }
