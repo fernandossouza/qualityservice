@@ -116,12 +116,12 @@ namespace qualityservice.Controllers
         }
 
          [HttpPost("Waiting/{productionOrderId}")]
-        public async Task<IActionResult> PostWaiting(int productionOrderId)
+        public async Task<IActionResult> PostWaiting(ProductionOrder productionOrder)
         {
             try{
                
                 var productionQuality = await _productionOrderQualityService
-                                                        .setProductionOrderQualityWaiting(productionOrderId);
+                                                        .setProductionOrderQualityWaiting(productionOrder.productionOrderId);
                 if(productionQuality != null)
                     return Ok(productionQuality);
                 return StatusCode(500, "");
