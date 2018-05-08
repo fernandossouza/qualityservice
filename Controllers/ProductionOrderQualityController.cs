@@ -115,8 +115,8 @@ namespace qualityservice.Controllers
             }
         }
 
-         [HttpPost("Waiting/{productionOrderId}")]
-        public async Task<IActionResult> PostWaiting(ProductionOrder productionOrder)
+         [HttpPost("Waiting")]
+        public async Task<IActionResult> PostWaiting([FromBody] ProductionOrder productionOrder)
         {
             try{
                
