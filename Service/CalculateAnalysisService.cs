@@ -47,9 +47,11 @@ namespace qualityservice.Service
                 productionOrderQuality = await _productionOrderQualityService.AddProductionOrderQuality(productionOrder);
            
             messages.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality,ajuste));
-            }
 
-            
+            productionOrderQuality.calculateInitial = messages;
+
+            await _productionOrderQualityService.updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId,productionOrderQuality);
+            }          
             return messages;
         }
         private async Task<List<MessageCalculates>> CalculatesAnalysis(Analysis analysisReal, ProductionOrder productionOrder, 

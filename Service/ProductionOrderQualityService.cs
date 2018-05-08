@@ -73,6 +73,7 @@ namespace qualityservice.Service
         {
             var productionOrderQualityDB = await _context.ProductionOrderQualities
                                                 .Where(x=>x.productionOrderQualityId == productionOrderQualityId)
+                                                .Include(x=>x.calculateInitial)
                                                 .Include(x=>x.Analysis)
                                                 .ThenInclude(x=>x.messages)
                                                 .Include(x=>x.Analysis)
@@ -92,6 +93,7 @@ namespace qualityservice.Service
             productionOrderQualityDB.productionOrderNumber = productioQualityUpdate.productionOrderNumber;
             productionOrderQualityDB.status = productioQualityUpdate.status;
             productionOrderQualityDB.qntForno = productioQualityUpdate.qntForno;
+            productionOrderQualityDB.calculateInitial = productioQualityUpdate.calculateInitial;
             
             //_context.ProductionOrderQualities.Update(productionOrderQualityDB);
             await _context.SaveChangesAsync();
@@ -112,6 +114,7 @@ namespace qualityservice.Service
         public async Task<ProductionOrderQuality> GetProductionOrder(int productionOrderId)
         {
             var productionOrder = await _context.ProductionOrderQualities
+                                                .Include(x=>x.calculateInitial)
                                                 .Include(x=>x.Analysis)
                                                 .ThenInclude(x=>x.messages)
                                                 .Include(x=>x.Analysis)
@@ -124,6 +127,7 @@ namespace qualityservice.Service
         public async Task<ProductionOrderQuality> GetProductionOrderQualityId(int productionOrderQualityId)
         {
             var productionOrderQuality = await _context.ProductionOrderQualities
+                                                .Include(x=>x.calculateInitial)
                                                 .Include(x=>x.Analysis)
                                                 .ThenInclude(x=>x.messages)
                                                 .Include(x=>x.Analysis)
@@ -137,6 +141,7 @@ namespace qualityservice.Service
         public async Task<ProductionOrderQuality> GetProductionOrderQualityNumber(string productionOrderNumber)
         {
             var productionOrderQuality = await _context.ProductionOrderQualities
+                                                .Include(x=>x.calculateInitial)
                                                 .Include(x=>x.Analysis)
                                                 .ThenInclude(x=>x.messages)
                                                 .Include(x=>x.Analysis)

@@ -11,6 +11,7 @@ namespace qualityservice.Model
         public string productionOrderNumber{get;set;}
         public string status{get;set;}
         public double qntForno{get;set;}
+        public List<MessageCalculates> calculateInitial{get;set;}
         public List<Analysis> Analysis{get;set;}
     }
 }
