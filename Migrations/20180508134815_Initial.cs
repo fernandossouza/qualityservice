@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace qualityservice.Migrations
 {
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,13 +33,8 @@ namespace qualityservice.Migrations
                 {
                     analysisId = table.Column<int>(type: "int4", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    cobreFosforoso = table.Column<string>(type: "text", nullable: true),
                     datetime = table.Column<long>(type: "int8", nullable: false),
-                    elem_Cu = table.Column<double>(type: "float8", nullable: false),
-                    elem_Fe = table.Column<double>(type: "float8", nullable: false),
-                    elem_Ni = table.Column<double>(type: "float8", nullable: false),
-                    elem_Pb = table.Column<double>(type: "float8", nullable: false),
-                    elem_Sn = table.Column<double>(type: "float8", nullable: false),
-                    message = table.Column<string>(type: "text", nullable: true),
                     number = table.Column<int>(type: "int4", nullable: false),
                     productionOrderQualityId = table.Column<int>(type: "int4", nullable: true),
                     status = table.Column<string>(type: "text", nullable: true)
@@ -55,14 +50,73 @@ namespace qualityservice.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AnalysisComps",
+                columns: table => new
+                {
+                    analysisCompId = table.Column<int>(type: "int4", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    analysisId = table.Column<int>(type: "int4", nullable: true),
+                    productId = table.Column<int>(type: "int4", nullable: false),
+                    productName = table.Column<string>(type: "text", nullable: true),
+                    value = table.Column<double>(type: "float8", nullable: false),
+                    valueKg = table.Column<double>(type: "float8", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnalysisComps", x => x.analysisCompId);
+                    table.ForeignKey(
+                        name: "FK_AnalysisComps_Analyses_analysisId",
+                        column: x => x.analysisId,
+                        principalTable: "Analyses",
+                        principalColumn: "analysisId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessagesCalculates",
+                columns: table => new
+                {
+                    messageId = table.Column<int>(type: "int4", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    analysisId = table.Column<int>(type: "int4", nullable: true),
+                    message = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessagesCalculates", x => x.messageId);
+                    table.ForeignKey(
+                        name: "FK_MessagesCalculates_Analyses_analysisId",
+                        column: x => x.analysisId,
+                        principalTable: "Analyses",
+                        principalColumn: "analysisId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Analyses_productionOrderQualityId",
                 table: "Analyses",
                 column: "productionOrderQualityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnalysisComps_analysisId",
+                table: "AnalysisComps",
+                column: "analysisId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessagesCalculates_analysisId",
+                table: "MessagesCalculates",
+                column: "analysisId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AnalysisComps");
+
+            migrationBuilder.DropTable(
+                name: "MessagesCalculates");
+
             migrationBuilder.DropTable(
                 name: "Analyses");
 

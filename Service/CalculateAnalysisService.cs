@@ -15,16 +15,18 @@ namespace qualityservice.Service
     public class CalculateAnalysisService : ICalculateAnalysisService
     {
         private readonly IConfiguration _configuration;
+        private readonly IProductionOrderQualityService _productionOrderQualityService;
         private HttpClient client;
 
-        public CalculateAnalysisService (IConfiguration configuration)
+        public CalculateAnalysisService (IConfiguration configuration, IProductionOrderQualityService productionOrderQualityService)
         {
             _configuration = configuration;
+            _productionOrderQualityService = productionOrderQualityService;
             client = new HttpClient();
         }
         
 
-        public async Task<List<string>> Calculates(int productionOrderId, int furnaceQuantity,Analysis analysis)
+        public async Task<List<string>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis)
         {
             List<string> stringReturn = new List<string>();
             var productionOrder = await GetProductionOrder(productionOrderId);
@@ -35,12 +37,17 @@ namespace qualityservice.Service
             }
             else
             {
+            
+            var productionOrderQuality = await _productionOrderQualityService.GetProductionOrder(productionOrder.productionOrderId);
+            if(productionOrderQuality == null)
+                productionOrderQuality = await _productionOrderQualityService.AddProductionOrderQuality(productionOrder);
            
-            stringReturn.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity));
+            stringReturn.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality));
             }
             return stringReturn;
         }
-        private async Task<List<string>> CalculatesAnalysis(Analysis analysisReal, ProductionOrder productionOrder, int furnaceQuantity)
+        private async Task<List<string>> CalculatesAnalysis(Analysis analysisReal, ProductionOrder productionOrder, 
+                                                            double furnaceQuantity, ProductionOrderQuality productionOrderQuality)
         {
             List<string> stringReturn = new List<string>();
             double maxForno = Convert.ToDouble(_configuration["maxForno"]);
@@ -101,7 +108,7 @@ namespace qualityservice.Service
                     stringReturn.Add("Excesso de Carga!");
                     return stringReturn;
                 }
-
+                productionOrderQuality.qntForno = qtdForno;
                 if(analysisEstimada.valueKg > 0)
                 {
                     string quantidadeAdicionar = string.Empty;
@@ -111,7 +118,7 @@ namespace qualityservice.Service
                     stringReturn.Add(quantidadeAdicionar);
                 }
             }
-
+            await _productionOrderQualityService.updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId,productionOrderQuality);
             return stringReturn;
         }
         

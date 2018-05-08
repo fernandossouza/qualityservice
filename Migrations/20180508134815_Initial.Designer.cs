@@ -11,8 +11,8 @@ using System;
 namespace qualityservice.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180306181930_initial")]
-    partial class initial
+    [Migration("20180508134815_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,19 +26,9 @@ namespace qualityservice.Migrations
                     b.Property<int>("analysisId")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("cobreFosforoso");
+
                     b.Property<long>("datetime");
-
-                    b.Property<double>("elem_Cu");
-
-                    b.Property<double>("elem_Fe");
-
-                    b.Property<double>("elem_Ni");
-
-                    b.Property<double>("elem_Pb");
-
-                    b.Property<double>("elem_Sn");
-
-                    b.Property<string>("message");
 
                     b.Property<int>("number");
 
@@ -51,6 +41,44 @@ namespace qualityservice.Migrations
                     b.HasIndex("productionOrderQualityId");
 
                     b.ToTable("Analyses");
+                });
+
+            modelBuilder.Entity("qualityservice.Model.AnalysisComp", b =>
+                {
+                    b.Property<int>("analysisCompId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("analysisId");
+
+                    b.Property<int>("productId");
+
+                    b.Property<string>("productName");
+
+                    b.Property<double>("value");
+
+                    b.Property<double>("valueKg");
+
+                    b.HasKey("analysisCompId");
+
+                    b.HasIndex("analysisId");
+
+                    b.ToTable("AnalysisComps");
+                });
+
+            modelBuilder.Entity("qualityservice.Model.MessageCalculates", b =>
+                {
+                    b.Property<int>("messageId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("analysisId");
+
+                    b.Property<string>("message");
+
+                    b.HasKey("messageId");
+
+                    b.HasIndex("analysisId");
+
+                    b.ToTable("MessagesCalculates");
                 });
 
             modelBuilder.Entity("qualityservice.Model.ProductionOrderQuality", b =>
@@ -80,6 +108,20 @@ namespace qualityservice.Migrations
                     b.HasOne("qualityservice.Model.ProductionOrderQuality")
                         .WithMany("Analysis")
                         .HasForeignKey("productionOrderQualityId");
+                });
+
+            modelBuilder.Entity("qualityservice.Model.AnalysisComp", b =>
+                {
+                    b.HasOne("qualityservice.Model.Analysis")
+                        .WithMany("comp")
+                        .HasForeignKey("analysisId");
+                });
+
+            modelBuilder.Entity("qualityservice.Model.MessageCalculates", b =>
+                {
+                    b.HasOne("qualityservice.Model.Analysis")
+                        .WithMany("messages")
+                        .HasForeignKey("analysisId");
                 });
 #pragma warning restore 612, 618
         }

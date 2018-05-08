@@ -34,29 +34,49 @@ namespace qualityservice.Service
 
             var tool = await GetToolApi(productionOrder.currentThing.thingId);
 
-            if(tool == null)
+            if(tool == null)//if(tool == null || tool.Count == 0)
             {
+                Console.WriteLine("Ferramenta nula");
                 return null;
             }
 
 
             productionOrderQuality.productionOrderNumber = productionOrder.productionOrderNumber;
             productionOrderQuality.productionOrderId = productionOrder.productionOrderId;
-            productionOrderQuality.forno = tool.FirstOrDefault().name;
-            productionOrderQuality.corrida = Convert.ToInt32(tool.FirstOrDefault().currentLife);
+            productionOrderQuality.forno = "Nome da Ferramenta";//tool.FirstOrDefault().name;
+            productionOrderQuality.corrida = 0;//Convert.ToInt32(tool.FirstOrDefault().currentLife);
             productionOrderQuality.posicao = productionOrder.currentThing.thingName;
-            productionOrderQuality.status = "waiting";
+            productionOrderQuality.status = "create";
 
             _context.ProductionOrderQualities.Add(productionOrderQuality);
             await _context.SaveChangesAsync();
             return productionOrderQuality;
-        }      
+        }    
+
+        public async Task<ProductionOrderQuality> setProductionOrderQualityWaiting(int productionOrderId)
+        {
+            var productionOrderQuality = await GetProductionOrder(productionOrderId);
+
+            if(productionOrderQuality == null)
+                return null;
+
+            productionOrderQuality.status="waiting";
+
+            productionOrderQuality = await updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId
+                                                                        ,productionOrderQuality);
+
+            return productionOrderQuality;
+        }  
 
         public async Task<ProductionOrderQuality> updateProductionOrderQuality(int productionOrderQualityId,
          ProductionOrderQuality productioQualityUpdate)
         {
             var productionOrderQualityDB = await _context.ProductionOrderQualities
                                                 .Where(x=>x.productionOrderQualityId == productionOrderQualityId)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.messages)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.comp)
                                                 .AsNoTracking()
                                                 .FirstOrDefaultAsync();
 
@@ -71,8 +91,9 @@ namespace qualityservice.Service
             productionOrderQualityDB.posicao = productioQualityUpdate.posicao;
             productionOrderQualityDB.productionOrderNumber = productioQualityUpdate.productionOrderNumber;
             productionOrderQualityDB.status = productioQualityUpdate.status;
-
-            _context.ProductionOrderQualities.Update(productionOrderQualityDB);
+            productionOrderQualityDB.qntForno = productioQualityUpdate.qntForno;
+            
+            //_context.ProductionOrderQualities.Update(productionOrderQualityDB);
             await _context.SaveChangesAsync();
             return productionOrderQualityDB;
         }
@@ -87,10 +108,26 @@ namespace qualityservice.Service
             return(productionOrderQualityList,total);
 
         }
+
+        public async Task<ProductionOrderQuality> GetProductionOrder(int productionOrderId)
+        {
+            var productionOrder = await _context.ProductionOrderQualities
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.messages)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.comp)
+                                                .Where(x=>x.productionOrderId == productionOrderId)
+                                                .FirstOrDefaultAsync();
+            
+            return productionOrder;
+        }
         public async Task<ProductionOrderQuality> GetProductionOrderQualityId(int productionOrderQualityId)
         {
             var productionOrderQuality = await _context.ProductionOrderQualities
                                                 .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.messages)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.comp)
                                                 .Where(x=>x.productionOrderQualityId == productionOrderQualityId)
                                                 .FirstOrDefaultAsync();
             
@@ -101,6 +138,9 @@ namespace qualityservice.Service
         {
             var productionOrderQuality = await _context.ProductionOrderQualities
                                                 .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.messages)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.comp)
                                                 .Where(x=>x.productionOrderNumber == productionOrderNumber)
                                                 .FirstOrDefaultAsync();
             

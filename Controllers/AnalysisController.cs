@@ -16,13 +16,14 @@ namespace qualityservice.Controllers
             _analysisService = analysisService;
         }
 
-        [HttpPost("{productionOrderQualityId}")]
-        public async Task<IActionResult> Post(int productionOrderQualityId,[FromBody] Analysis analysis)
+
+        [HttpPost("productionOrder/{productionOrderId}")]
+        public async Task<IActionResult> PostProductionOrder(int productionOrderId,[FromBody] Analysis analysis)
         {
             try{
                 if (ModelState.IsValid)
                 {
-                    var analysisDb = await _analysisService.AddAnalysis(productionOrderQualityId,analysis);
+                    var analysisDb = await _analysisService.AddAnalysis(productionOrderId,analysis);
 
                      return Created($"api/productionOrderQuality/{analysisDb.analysisId}", analysisDb);
                 }   

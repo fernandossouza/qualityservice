@@ -9,7 +9,8 @@ namespace qualityservice.Model
         public int number{get;set;}
         public long datetime{get;set;}
         public string status{get;set;}
-        public string message{get;set;}
+        public List<MessageCalculates> messages{get;set;}
+        public string cobreFosforoso{get;set;}
         [Required]
         public List<AnalysisComp> comp {get;set;}
     }

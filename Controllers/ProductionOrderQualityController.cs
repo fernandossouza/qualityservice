@@ -77,6 +77,25 @@ namespace qualityservice.Controllers
             }
         }
 
+         [HttpGet("productionOrder/{productionOrderId}")]
+        public async Task<IActionResult> GetProductionOrderId(int productionOrderId)
+        {
+            try{
+                
+                var productionQuality = await _productionOrderQualityService
+                                                           .GetProductionOrder(productionOrderId);
+
+                if(productionQuality == null)
+                    return NotFound();
+
+                return Ok(productionQuality);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ProductionOrder productionOrder)
         {
@@ -89,6 +108,23 @@ namespace qualityservice.Controllers
                      return Created($"api/productionOrderQuality/{productionQuality.productionOrderQualityId}", productionQuality);
                 }   
             return BadRequest(ModelState);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+         [HttpPost("Waiting/{productionOrderId}")]
+        public async Task<IActionResult> PostWaiting(int productionOrderId)
+        {
+            try{
+               
+                var productionQuality = await _productionOrderQualityService
+                                                        .setProductionOrderQualityWaiting(productionOrderId);
+                if(productionQuality != null)
+                    return Ok(productionQuality);
+                return StatusCode(500, "");
             }
             catch(Exception ex)
             {

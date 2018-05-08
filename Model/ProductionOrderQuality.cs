@@ -10,6 +10,7 @@ namespace qualityservice.Model
         public int productionOrderId{get;set;}
         public string productionOrderNumber{get;set;}
         public string status{get;set;}
+        public double qntForno{get;set;}
         public List<Analysis> Analysis{get;set;}
     }
 }

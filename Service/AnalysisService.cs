@@ -18,22 +18,24 @@ namespace qualityservice.Service
         private readonly IProductionOrderQualityService _productionOrderQualityService;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ICalculateAnalysisService _calculateAnalysisService;
         private HttpClient client;
 
         public AnalysisService(IProductionOrderQualityService productionOrderQualityService,
-         ApplicationDbContext context, IConfiguration configuration)
+         ApplicationDbContext context, IConfiguration configuration,ICalculateAnalysisService calculateAnalysisService)
         {
             _context = context;
             _productionOrderQualityService = productionOrderQualityService;
             _configuration = configuration;
+            _calculateAnalysisService = calculateAnalysisService;
             client = new HttpClient();
         }
-        
-        public async Task<Analysis> AddAnalysis(int productionOrderQualityId,Analysis analysis)
+
+        public async Task<Analysis> AddAnalysis(int productionOrderId,Analysis analysis)
         {
             analysis.datetime = DateTime.Now.Ticks;
 
-            var productionQuality = await _productionOrderQualityService.GetProductionOrderQualityId(productionOrderQualityId);
+            var productionQuality = await _productionOrderQualityService.GetProductionOrder(productionOrderId);
 
             if(productionQuality.Analysis.Count <=0)
                 productionQuality.Analysis = new List<Analysis>();
@@ -41,14 +43,23 @@ namespace qualityservice.Service
             analysis.number = productionQuality.Analysis.Count + 1;
 
             // Espaço para os cálculos
-            var(returnSpecification,stringErro) = await RecipeSpecification(analysis,productionQuality.productionOrderId);
+            var(returnSpecification,stringRetorno) = await RecipeSpecification(analysis,productionQuality.productionOrderId
+            ,productionQuality.qntForno);
 
             if(returnSpecification)
                 analysis.status = "approved";
             else
                 analysis.status = "reproved";
+            foreach (var item in stringRetorno)
+            {
+                MessageCalculates message = new MessageCalculates();
+                message.message = item.ToString();
+                
+                if(analysis.messages == null)
+                    analysis.messages = new List<MessageCalculates>();
 
-            analysis.message = stringErro;
+                analysis.messages.Add(message);
+            }
             // Fim
 
             var returnApi = await PutStatusAnalysisForProductionOrder(productionQuality.productionOrderId,analysis.status);
@@ -68,14 +79,17 @@ namespace qualityservice.Service
 
         }
 
-        private async Task<(bool,string)> RecipeSpecification(Analysis analysis, int productionOrderId)
+        private async Task<(bool,List<string>)> RecipeSpecification(Analysis analysis, int productionOrderId, double qtdForno)
         {
             bool Approved = false;
+            List<string> stringRetorno = new List<string>(); 
             var productionOrder = await GetProductionOrder(productionOrderId);
 
             if(productionOrder == null)
-                return (false,"ERRO - Não encontrado a ordem de produção na API");
-
+            {
+                stringRetorno.Add("ERRO - Não encontrado a ordem de produção na API");
+                return (false,stringRetorno);
+            }
             foreach(var phase in productionOrder.recipe.phases)
             {
                 foreach(var comp in analysis.comp)
@@ -83,11 +97,15 @@ namespace qualityservice.Service
                     var recipeComp = phase.phaseProducts.Where(x=>x.product.productId == comp.productId).FirstOrDefault();
 
                     if(recipeComp == null)
-                        return(false,"ERRO - Componente quimico não existe na receita, productId: " + comp.productId );
-
+                    {
+                        stringRetorno.Add("ERRO - Componente quimico não existe na receita, productId: " + comp.productId);
+                        return(false,stringRetorno);
+                    }
+                    comp.productName = recipeComp.product.productName;
                     if(recipeComp.minValue >= comp.value || recipeComp.maxValue <= comp.value)
                     {
-
+                        Approved = false;
+                        break;
                     }
 
                     Approved = true;
@@ -95,9 +113,12 @@ namespace qualityservice.Service
             }
 
             if(Approved)
-                return (true,string.Empty);
-            else
-                return (false,"ERRO - a ordem de produçaõ não possui phase ou não foi possivel obter as analises quimicas");
+                return (Approved,stringRetorno);
+
+            stringRetorno = await _calculateAnalysisService.Calculates(productionOrder.productionOrderId,qtdForno,analysis);           
+            
+
+            return (Approved,stringRetorno);
 
         }
 

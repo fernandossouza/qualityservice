@@ -10,6 +10,8 @@ namespace qualityservice.Service.Interface
          Task<ProductionOrderQuality> updateProductionOrderQuality(int productionOrderQualityId,ProductionOrderQuality productioQualityUpdate);
          Task<(List<ProductionOrderQuality>,int)> GetProductionOrderQualityPerStatus(string status,int startat, int quantity);
          Task<ProductionOrderQuality> GetProductionOrderQualityId(int productionOrderQualityId);
-         Task<ProductionOrderQuality> GetProductionOrderQualityNumber(string productionOrderNumber);         
+         Task<ProductionOrderQuality> GetProductionOrder(int productionOrderId);
+         Task<ProductionOrderQuality> GetProductionOrderQualityNumber(string productionOrderNumber);
+         Task<ProductionOrderQuality> setProductionOrderQualityWaiting(int productionOrderId);         
     }
 }
