@@ -115,7 +115,7 @@ namespace qualityservice.Service
             if(Approved)
                 return (Approved,stringRetorno);
 
-            stringRetorno = await _calculateAnalysisService.Calculates(productionOrder.productionOrderId,qtdForno,analysis);           
+            stringRetorno = await _calculateAnalysisService.Calculates(productionOrder.productionOrderId,qtdForno,analysis,true);           
             
 
             return (Approved,stringRetorno);

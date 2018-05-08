@@ -23,7 +23,7 @@ namespace qualityservice.Controllers
             try{
                 if (ModelState.IsValid)
                 {
-                    var returnCalculate = await _calculateAnalysisService.Calculates(productionOrderId,furnaceQuantity,analysis);
+                    var returnCalculate = await _calculateAnalysisService.Calculates(productionOrderId,furnaceQuantity,analysis,false);
 
                      return Ok(returnCalculate);
                 }   

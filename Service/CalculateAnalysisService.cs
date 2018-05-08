@@ -26,7 +26,7 @@ namespace qualityservice.Service
         }
         
 
-        public async Task<List<string>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis)
+        public async Task<List<string>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis,bool ajuste)
         {
             List<string> stringReturn = new List<string>();
             var productionOrder = await GetProductionOrder(productionOrderId);
@@ -42,18 +42,29 @@ namespace qualityservice.Service
             if(productionOrderQuality == null)
                 productionOrderQuality = await _productionOrderQualityService.AddProductionOrderQuality(productionOrder);
            
-            stringReturn.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality));
+            stringReturn.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality,ajuste));
             }
             return stringReturn;
         }
         private async Task<List<string>> CalculatesAnalysis(Analysis analysisReal, ProductionOrder productionOrder, 
-                                                            double furnaceQuantity, ProductionOrderQuality productionOrderQuality)
+                                                            double furnaceQuantity, ProductionOrderQuality productionOrderQuality,bool ajuste)
         {
             List<string> stringReturn = new List<string>();
             double maxForno = Convert.ToDouble(_configuration["maxForno"]);
+            double porcentagemForno = Convert.ToDouble(_configuration["porcentagemForno"]);
+            int cobreFosforosoId = Convert.ToInt32(_configuration["cobreFosforosoId"]);
             AnalysisComp analysisCobreEstimada = new AnalysisComp();
             double qtdForno = 0;
             
+            if(!ajuste)
+                maxForno = maxForno * (porcentagemForno/100);
+
+
+            // Removendo cobre fosforoso dos calculos PONTO 1/2
+            var cobreFosforosoComp = analysisReal.comp.Where(x=>x.productId == cobreFosforosoId).FirstOrDefault();
+            if(cobreFosforosoComp != null)
+                analysisReal.comp.Remove(cobreFosforosoComp);
+            // Fim da remoção 1/2
 
             foreach(var compAnalysis in analysisReal.comp)
             {
@@ -63,6 +74,11 @@ namespace qualityservice.Service
             List<AnalysisComp> analysisRecipeList = new List<AnalysisComp>();
             foreach(var compRecipe in productionOrder.recipe.phases.FirstOrDefault().phaseProducts)
             {
+                 // Removendo cobre fosforoso dos calculos PONTO 2/2
+                if(compRecipe.product.productId == cobreFosforosoId)
+                    continue;
+                // Fim da remoção 1/2
+
                 AnalysisComp analysisRecipe = new AnalysisComp();
                 analysisRecipe.productId = compRecipe.product.productId;
                 analysisRecipe.productName = compRecipe.product.productName;
