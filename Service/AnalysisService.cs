@@ -102,7 +102,7 @@ namespace qualityservice.Service
                         return(false,messages);
                     }
                     comp.productName = recipeComp.product.productName;
-                    if(recipeComp.minValue >= comp.value || recipeComp.maxValue <= comp.value)
+                    if(recipeComp.minValue > comp.value || recipeComp.maxValue < comp.value)
                     {
                         Approved = false;
                         break;
