@@ -130,6 +130,7 @@ namespace qualityservice.Service
 
                 if(qtdForno > maxForno)
                 {
+                    messages = new List<MessageCalculates>();
                     MessageCalculates message = new MessageCalculates();
                     message.key = "Excesso de Carga!";
                     message.value = "Excesso de Carga!";
