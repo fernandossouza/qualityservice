@@ -42,15 +42,17 @@ namespace qualityservice.Service
             else
             {
             
-            var productionOrderQuality = await _productionOrderQualityService.GetProductionOrder(productionOrder.productionOrderId);
-            if(productionOrderQuality == null)
-                productionOrderQuality = await _productionOrderQualityService.AddProductionOrderQuality(productionOrder);
-           
-            messages.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality,ajuste));
+                var productionOrderQuality = await _productionOrderQualityService.GetProductionOrder(productionOrder.productionOrderId);
+                if(productionOrderQuality == null)
+                    productionOrderQuality = await _productionOrderQualityService.AddProductionOrderQuality(productionOrder);
+            
+                messages.AddRange(await CalculatesAnalysis(analysis,productionOrder,furnaceQuantity,productionOrderQuality,ajuste));
 
-            productionOrderQuality.calculateInitial = messages;
-
-            await _productionOrderQualityService.updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId,productionOrderQuality);
+                if(!ajuste)
+                {
+                    productionOrderQuality.calculateInitial = messages;
+                    await _productionOrderQualityService.updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId,productionOrderQuality);
+                }
             }          
             return messages;
         }
@@ -87,7 +89,7 @@ namespace qualityservice.Service
                  // Removendo cobre fosforoso dos calculos PONTO 2/2
                 if(compRecipe.product.productId == cobreFosforosoId)
                     continue;
-                // Fim da remoção 1/2
+                // Fim da remoção 2/2
 
                 AnalysisComp analysisRecipe = new AnalysisComp();
                 analysisRecipe.productId = compRecipe.product.productId;

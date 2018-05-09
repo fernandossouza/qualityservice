@@ -52,6 +52,7 @@ namespace qualityservice.Service
                 analysis.status = "reproved";
             
             analysis.messages= messages;
+            productionQuality.CobreFosforosoAtual = analysis.cobreFosforoso;
             // Fim
 
             var returnApi = await PutStatusAnalysisForProductionOrder(productionQuality.productionOrderId,analysis.status);
