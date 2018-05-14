@@ -138,6 +138,35 @@ namespace qualityservice.Service
             return productionOrderQuality;
             
         }
+        public async Task<List<ProductionOrderQuality>> GetProductionOrderQaulityPerRecipeCode(string recipeCode,long startDate,long endDate)
+        {
+            var productionOrderQualityList = await _context.ProductionOrderQualities
+                                                .Include(x=>x.calculateInitial)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.messages)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.comp)
+                                                .Where(x=>x.recipeCode == recipeCode 
+                                                && x.Analysis.Any(a=>a.datetime>=startDate)
+                                                && x.Analysis.Any(a=>a.datetime<=endDate))
+                                                .ToListAsync();
+            
+            return productionOrderQualityList;
+        }
+        public async Task<List<ProductionOrderQuality>> GetProductionOrderQaulityPerDate(long startDate,long endDate)
+        {
+            var productionOrderQualityList = await _context.ProductionOrderQualities
+                                                .Include(x=>x.calculateInitial)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.messages)
+                                                .Include(x=>x.Analysis)
+                                                .ThenInclude(x=>x.comp)
+                                                .Where(x=> x.Analysis.Any(a=>a.datetime>=startDate)
+                                                && x.Analysis.Any(a=>a.datetime<=endDate))
+                                                .ToListAsync();
+            
+            return productionOrderQualityList;
+        }
         public async Task<ProductionOrderQuality> GetProductionOrderQualityNumber(string productionOrderNumber)
         {
             var productionOrderQuality = await _context.ProductionOrderQualities

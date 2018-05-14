@@ -39,6 +39,47 @@ namespace qualityservice.Controllers
             }
         }
 
+        [HttpGet("recipeCode/{recipeCode}")]
+        public async Task<IActionResult> GetRecipeCode(string recipeCode,[FromQuery]long startDate, [FromQuery]long endDate)
+        {
+            try{   
+
+
+                var productionQualityList = await _productionOrderQualityService
+                                                            .GetProductionOrderQaulityPerRecipeCode(recipeCode,
+                                                            startDate,endDate);
+
+                if(productionQualityList == null)
+                    return NotFound();
+
+                return Ok(productionQualityList);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("Date")]
+        public async Task<IActionResult> GetDate([FromQuery]long startDate, [FromQuery]long endDate)
+        {
+            try{   
+
+
+                var productionQualityList = await _productionOrderQualityService
+                                                            .GetProductionOrderQaulityPerDate(startDate,endDate);
+
+                if(productionQualityList == null)
+                    return NotFound();
+
+                return Ok(productionQualityList);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [HttpGet("id/{id}")]
         public async Task<IActionResult> Get(int id)
         {

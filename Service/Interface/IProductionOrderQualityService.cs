@@ -11,6 +11,7 @@ namespace qualityservice.Service.Interface
          Task<(List<ProductionOrderQuality>,int)> GetProductionOrderQualityPerStatus(string status,int startat, int quantity);
          Task<ProductionOrderQuality> GetProductionOrderQualityId(int productionOrderQualityId);
          Task<ProductionOrderQuality> GetProductionOrder(int productionOrderId);
+         Task<List<ProductionOrderQuality>> GetProductionOrderQaulityPerRecipeCode(string recipeCode,long startDate,long endDate);
          Task<ProductionOrderQuality> GetProductionOrderQualityNumber(string productionOrderNumber);
          Task<ProductionOrderQuality> setProductionOrderQualityWaiting(int productionOrderId);         
     }
