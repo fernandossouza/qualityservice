@@ -15,6 +15,8 @@ using Microsoft.Extensions.Options;
 using qualityservice.Data;
 using qualityservice.Service;
 using qualityservice.Service.Interface;
+using securityfilter.Services;
+using securityfilter.Services.Interfaces;
 
 namespace qualityservice {
     public class Startup {
@@ -31,6 +33,9 @@ namespace qualityservice {
                     .AllowAnyMethod ()
                     .AllowAnyHeader ();
             }));
+            services.AddSingleton<IConfiguration> (Configuration);
+            services.AddTransient<IEncryptService, EncryptService> ();
+                      
             if (!String.IsNullOrEmpty (Configuration["KeyFolder"]))
                 services.AddDataProtection ()
                 .SetApplicationName ("Lorien")
