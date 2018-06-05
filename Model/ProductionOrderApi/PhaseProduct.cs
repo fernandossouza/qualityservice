@@ -14,5 +14,6 @@ namespace qualityservice.Model.ProductionOrderApi
         public string measurementUnit { get; set; }
         [Required]
         public Product product { get; set; }
+        public string phaseProductType { get; set; }
     }
 }

@@ -91,6 +91,10 @@ namespace qualityservice.Service
                     continue;
                 // Fim da remoção 2/2
 
+                // Retirando contaminantes
+                if(compRecipe.phaseProductType.ToLower() == "contaminent")
+                    continue;
+
                 AnalysisComp analysisRecipe = new AnalysisComp();
                 analysisRecipe.productId = compRecipe.product.productId;
                 analysisRecipe.productName = compRecipe.product.productName;
