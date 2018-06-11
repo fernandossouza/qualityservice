@@ -46,6 +46,7 @@ namespace qualityservice {
             services.AddTransient<IProductionOrderQualityService, ProductionOrderQualityService> ();
             services.AddTransient<IAnalysisService, AnalysisService> ();
             services.AddTransient<ICalculateAnalysisService, CalculateAnalysisService> ();
+            services.AddTransient<IProductionOrderService,ProductionOrderService>();
             services.AddMvc ();
         }
 
