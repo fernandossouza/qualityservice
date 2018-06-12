@@ -34,7 +34,7 @@ namespace qualityservice.Service
         public async Task<Analysis> AddAnalysis(int productionOrderId,Analysis analysis)
         {
             analysis.datetime = DateTime.Now.Ticks;
-
+            var username = analysis.username.ToString();
             var productionQuality = await _productionOrderQualityService.GetProductionOrder(productionOrderId);
 
             if(productionQuality.Analysis.Count <=0)
@@ -55,11 +55,20 @@ namespace qualityservice.Service
             productionQuality.CobreFosforosoAtual = analysis.cobreFosforoso;
             // Fim
 
-            var returnApi = await PutStatusAnalysisForProductionOrder(productionQuality.productionOrderId,analysis.status);
+            var returnApi = await PutStatusAnalysisForProductionOrder(productionQuality.productionOrderId,analysis.status, username);
             
             if(returnApi)
             {
                 productionQuality.status = analysis.status;
+
+                //insere o usuario na análise
+                if(analysis.username == null)
+                productionQuality.username = "NULO";
+
+                productionQuality.username = analysis.username;
+
+                Console.WriteLine("Saving - printing analysis: ");
+                Console.WriteLine(analysis.ToString());
 
                 productionQuality.Analysis.Add(analysis);
 
@@ -122,11 +131,13 @@ namespace qualityservice.Service
 
         }
 
-        private async Task<bool> PutStatusAnalysisForProductionOrder(int productionOrderId,string status)
+        private async Task<bool> PutStatusAnalysisForProductionOrder(int productionOrderId,string status, string username)
         {
             var builder = new UriBuilder(_configuration["ProductionOrderStatusApi"] + "?productionOrderId="
-             + productionOrderId +"&state="+status);
+             + productionOrderId +"&state="+status + "&username=" +  username);
             string url = builder.ToString();
+            Console.WriteLine("URL - OP Status");
+            Console.WriteLine(url);
             var result = await client.PutAsync(url,null);
             
             if(result.StatusCode == HttpStatusCode.OK || result.StatusCode == HttpStatusCode.NoContent)
