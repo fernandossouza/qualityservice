@@ -13,6 +13,7 @@ namespace qualityservice.Model
         public string recipeCode{get;set;}
         public double qntForno{get;set;}
         public string CobreFosforosoAtual{get;set;}
+        public string username{get;set;}     
         public List<MessageCalculates> calculateInitial{get;set;}
         public List<Analysis> Analysis{get;set;}
     }

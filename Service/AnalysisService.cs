@@ -61,6 +61,15 @@ namespace qualityservice.Service
             {
                 productionQuality.status = analysis.status;
 
+                //insere o usuario na análise
+                if(analysis.username == null)
+                productionQuality.username = "NULO";
+
+                productionQuality.username = analysis.username;
+
+                Console.WriteLine("Saving - printing analysis: ");
+                Console.WriteLine(analysis.ToString());
+
                 productionQuality.Analysis.Add(analysis);
 
                 await _context.SaveChangesAsync();

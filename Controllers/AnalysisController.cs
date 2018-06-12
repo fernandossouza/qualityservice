@@ -19,6 +19,8 @@ namespace qualityservice.Controllers {
         public async Task<IActionResult> PostProductionOrder (int productionOrderId, [FromBody] Analysis analysis) {
             try {
                 if (ModelState.IsValid) {
+                    Console.WriteLine("analysis: ");
+                    Console.WriteLine(analysis.ToString());
                     var analysisDb = await _analysisService.AddAnalysis (productionOrderId, analysis);
 
                     return Created ($"api/productionOrderQuality/{analysisDb.analysisId}", analysisDb);
