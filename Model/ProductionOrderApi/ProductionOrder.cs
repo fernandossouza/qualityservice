@@ -20,5 +20,6 @@ namespace qualityservice.Model.ProductionOrderApi
         [Required]
         public Thing currentThing { get; set; }
         public Recipe recipe { get; set; }
+        public double quantForno{get;set;}
     }
 }

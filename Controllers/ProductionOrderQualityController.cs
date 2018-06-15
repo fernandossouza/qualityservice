@@ -142,7 +142,7 @@ namespace qualityservice.Controllers {
             try {
 
                 var productionQuality = await _productionOrderQualityService
-                    .setProductionOrderQualityWaiting (productionOrder.productionOrderId);
+                    .setProductionOrderQualityWaiting (productionOrder);
                 if (productionQuality != null)
                     return Ok (productionQuality);
                 return StatusCode (500, "");

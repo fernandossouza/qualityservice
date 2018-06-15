@@ -34,11 +34,11 @@ namespace qualityservice.Service
 
             var tool = await GetToolApi(productionOrder.currentThing.thingId);
 
-            if(tool == null)//if(tool == null || tool.Count == 0)
-            {
-                Console.WriteLine("Ferramenta nula");
-                return null;
-            }
+            // if(tool == null)//if(tool == null || tool.Count == 0)
+            // {
+            //     Console.WriteLine("Ferramenta nula");
+            //     return null;
+            // }
 
 
             productionOrderQuality.productionOrderNumber = productionOrder.productionOrderNumber;
@@ -47,21 +47,22 @@ namespace qualityservice.Service
             productionOrderQuality.corrida = 0;//Convert.ToInt32(tool.FirstOrDefault().currentLife);
             productionOrderQuality.posicao = productionOrder.currentThing.thingName;
             productionOrderQuality.status = "create";
+            productionOrderQuality.qntForno = productionOrder.quantForno;
 
             _context.ProductionOrderQualities.Add(productionOrderQuality);
             await _context.SaveChangesAsync();
             return productionOrderQuality;
         }    
 
-        public async Task<ProductionOrderQuality> setProductionOrderQualityWaiting(int productionOrderId)
+        public async Task<ProductionOrderQuality> setProductionOrderQualityWaiting(ProductionOrder productionOrder)
         {
-            var productionOrderQuality = await GetProductionOrder(productionOrderId);
+            var productionOrderQuality = await GetProductionOrder(productionOrder.productionOrderId);
 
             if(productionOrderQuality == null)
                 return null;
 
             productionOrderQuality.status="waiting";
-
+            productionOrderQuality.qntForno = productionOrder.quantForno;
             productionOrderQuality = await updateProductionOrderQuality(productionOrderQuality.productionOrderQualityId
                                                                         ,productionOrderQuality);
 

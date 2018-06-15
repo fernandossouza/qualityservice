@@ -80,6 +80,15 @@ namespace qualityservice.Service
 
             foreach(var compAnalysis in analysisReal.comp)
             {
+                var componenteRecipe = productionOrder.recipe.phases.FirstOrDefault()
+                                        .phaseProducts
+                                        .Where(x=>x.product.productId == compAnalysis.productId).FirstOrDefault();
+
+                if(componenteRecipe == null)
+                    compAnalysis.type = "contaminent";
+                else
+                    compAnalysis.type = componenteRecipe.phaseProductType.ToLower();
+                                            
                 compAnalysis.valueKg = (compAnalysis.value / 100) * furnaceQuantity;
             }
 
@@ -93,7 +102,9 @@ namespace qualityservice.Service
 
                 // Retirando contaminantes
                 if(compRecipe.phaseProductType.ToLower() == "contaminent")
+                {
                     continue;
+                }
 
                 AnalysisComp analysisRecipe = new AnalysisComp();
                 analysisRecipe.productId = compRecipe.product.productId;
@@ -105,6 +116,8 @@ namespace qualityservice.Service
             }
 
             List<AnalysisComp> analysisEstimadaList = new List<AnalysisComp>();
+
+            qtdForno = analysisReal.comp.Where(a=>a.type == "contaminent").Sum(a=>a.valueKg);
 
             foreach(var comp in analysisRecipeList)
             {
@@ -132,8 +145,13 @@ namespace qualityservice.Service
                 if(analysisEstimada.valueKg < 0)
                     qtdForno = qtdForno + (analysisEstimada.valueKg * -1) + compAnalysis.valueKg;
                 else
+                {
                     qtdForno = qtdForno + analysisEstimada.valueKg + compAnalysis.valueKg;
-
+                }
+                    
+                Console.WriteLine("estimada " + analysisEstimada.valueKg);
+                Console.WriteLine("analise " +compAnalysis.valueKg);    
+                Console.WriteLine("Forno " +qtdForno);
                 if(qtdForno > maxForno)
                 {
                     messages = new List<MessageCalculates>();
@@ -143,7 +161,7 @@ namespace qualityservice.Service
                     messages.Add(message);
                     return messages;
                 }
-                productionOrderQuality.qntForno = qtdForno;
+                //productionOrderQuality.qntForno = qtdForno;
                 if(analysisEstimada.valueKg > 0)
                 {
                     MessageCalculates message = new MessageCalculates();

@@ -10,5 +10,7 @@ namespace qualityservice.Model
         [Required]
         public double value{get;set;}
         public double valueKg{get;set;}
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public string type{get;set;}
     }
 }
