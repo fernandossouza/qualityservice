@@ -155,6 +155,7 @@ namespace qualityservice.Service
             if(result.StatusCode == HttpStatusCode.OK || result.StatusCode == HttpStatusCode.NoContent)
                 return JsonConvert.DeserializeObject<ProductionOrder>(await client.GetStringAsync(url));
 
+            Console.WriteLine("GetProductionOrder - status code != 202 e 204");
             return null;
         }
     }
