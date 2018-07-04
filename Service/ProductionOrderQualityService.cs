@@ -58,8 +58,11 @@ namespace qualityservice.Service
         {
             var productionOrderQuality = await GetProductionOrder(productionOrder.productionOrderId);
 
-            if(productionOrderQuality == null)
+            if(productionOrderQuality == null){
+            Console.WriteLine("productionOrderQuality NULA");
+
                 return null;
+            }
 
             productionOrderQuality.status="waiting";
             productionOrderQuality.qntForno = productionOrder.quantForno;
@@ -85,6 +88,8 @@ namespace qualityservice.Service
             if (productionOrderQualityDB == null && 
             productionOrderQualityDB.productionOrderQualityId != productionOrderQualityId)
             {
+                Console.WriteLine("ProductionOrderQualityService");
+                Console.WriteLine("productionOrderQualityDB == null && productionOrderQualityDB.productionOrderQualityId != productionOrderQualityId");
                 return null;
             }
 
