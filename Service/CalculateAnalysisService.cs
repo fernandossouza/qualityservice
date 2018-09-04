@@ -88,7 +88,8 @@ namespace qualityservice.Service {
                 // Fim da remoção 2/2
 
                 // Retirando contaminantes
-                if (compRecipe.phaseProductType.ToLower () == "contaminent" || compRecipe.phaseProductType.ToLower () == "scrap") {
+                if(compRecipe.phaseProductType.ToLower() == "contaminent" || compRecipe.phaseProductType.ToLower () == "scrap" || compRecipe.phaseProductType.ToLower() == "semi_finished")
+                {
                     continue;
                 }
 
