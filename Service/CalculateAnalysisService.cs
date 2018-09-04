@@ -101,7 +101,7 @@ namespace qualityservice.Service
                 // Fim da remoção 2/2
 
                 // Retirando contaminantes
-                if(compRecipe.phaseProductType.ToLower() == "contaminent")
+                if(compRecipe.phaseProductType.ToLower() == "contaminent" || compRecipe.phaseProductType.ToLower() == "semi_finished")
                 {
                     continue;
                 }
