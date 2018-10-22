@@ -8,5 +8,6 @@ namespace qualityservice.Service.Interface
     public interface ICalculateAnalysisService
     {
          Task<List<MessageCalculates>> Calculates(int productionOrderId, double furnaceQuantity,Analysis analysis,bool ajuste);
+         Task<List<MessageCalculates>> Recalculates (int productionOrderId,int productId, double quantityInput );
     }
 }

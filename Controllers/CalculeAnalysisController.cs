@@ -30,5 +30,19 @@ namespace qualityservice.Controllers {
             }
         }
 
+        [HttpPut ("recalculate/")]
+        public async Task<IActionResult> PutRecalculate ([FromQuery] int productionOrderId, [FromQuery] int productId, [FromQuery] double quantityInput) {
+            try {
+                if (ModelState.IsValid) {
+                    var returnCalculate = await _calculateAnalysisService.Recalculates (productionOrderId, productId, quantityInput);
+
+                    return Ok (returnCalculate);
+                }
+                return BadRequest (ModelState);
+            } catch (Exception ex) {
+                return StatusCode (500, ex.Message);
+            }
+        }
+
     }
 }

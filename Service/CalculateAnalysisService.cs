@@ -47,6 +47,54 @@ namespace qualityservice.Service {
             }
             return messages;
         }
+
+        public async Task<List<MessageCalculates>> Recalculates (int productionOrderId,int productId, double quantityInput )
+        {
+            var productionOrder = await GetProductionOrder (productionOrderId);
+            
+            var productRecipe = productionOrder.recipe.phases.FirstOrDefault ()
+                    .phaseProducts
+                    .Where (x => x.product.productId == productId).FirstOrDefault ();
+
+            
+            var productionOrderQuality = await _productionOrderQualityService.GetProductionOrder (productionOrderId);
+
+            var messagesProductionOrder = productionOrderQuality.calculateInitial;
+
+            if(productRecipe.phaseProductType.ToLower() == "scrap")
+            {
+                var quantityMessageTotal = messagesProductionOrder.Sum(a=> Convert.ToDouble(a.value));
+
+                foreach(var message in messagesProductionOrder)
+                {
+                    var productRecipeDebit = productionOrder.recipe.phases.FirstOrDefault ()
+                    .phaseProducts
+                    .Where (x => x.product.productId == message.productId).FirstOrDefault ();
+
+                    double percentProduct = 0;
+                    if(productRecipeDebit.phaseProductType.ToLower() == "base_product")
+                        percentProduct = productRecipeDebit.maxValue;
+                    else
+                        percentProduct = productRecipeDebit.minValue;
+
+                    var quantityDebit = quantityInput * (percentProduct / 100);
+                    message.value = Math.Round((Convert.ToDouble(message.value) - quantityDebit),2).ToString();
+                }
+
+            }
+            else
+            {
+                var productMessage = messagesProductionOrder.Where(a=>a.productId == productId).FirstOrDefault();
+
+                if(productMessage != null)
+                    productMessage.value = Math.Round((Convert.ToDouble(productMessage.value) - quantityInput),2).ToString();
+            }
+
+            await _productionOrderQualityService.updateProductionOrderQuality (productionOrderQuality.productionOrderQualityId, productionOrderQuality);
+
+            return messagesProductionOrder;
+
+        }
         private async Task<List<MessageCalculates>> CalculatesAnalysis (Analysis analysisReal, ProductionOrder productionOrder,
             double furnaceQuantity, ProductionOrderQuality productionOrderQuality, bool ajuste) {
 
@@ -140,7 +188,8 @@ namespace qualityservice.Service {
                     messages = new List<MessageCalculates> ();
                     MessageCalculates message = new MessageCalculates ();
                     message.key = "Excesso de Carga!";
-                    message.value = "Excesso de Carga!";
+                    message.value = "0";
+                    message.productId = 0;
                     messages.Add (message);
                     return messages;
                 }
@@ -148,6 +197,7 @@ namespace qualityservice.Service {
                 if (analysisEstimada.valueKg > 0) {
                     MessageCalculates message = new MessageCalculates ();
                     message.key = analysisEstimada.productName;
+                    message.productId = analysisEstimada.productId;
                     message.value = analysisEstimada.valueKg.ToString ();
 
                     messages.Add (message);
