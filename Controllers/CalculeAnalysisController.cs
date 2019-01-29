@@ -16,7 +16,7 @@ namespace qualityservice.Controllers {
         }
 
         [HttpPut ()]
-        [SecurityFilter ("quality__allow_update")]
+        //[SecurityFilter ("quality__allow_update")]
         public async Task<IActionResult> Put ([FromQuery] int productionOrderId, [FromQuery] int furnaceQuantity, [FromBody] Analysis analysis) {
             try {
                 if (ModelState.IsValid) {

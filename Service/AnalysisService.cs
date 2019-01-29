@@ -52,6 +52,7 @@ namespace qualityservice.Service
                 analysis.status = "reproved";
             
             analysis.messages= messages;
+            productionQuality.calculateInitial = messages;
             productionQuality.CobreFosforosoAtual = analysis.cobreFosforoso;
             // Fim
 
